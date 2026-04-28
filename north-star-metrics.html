@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>North Star Metrics · Lang Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+:root {
+    --gold: #c9a961; --gold-bright: #e8c573; --gold-dark: #8a7038; --gold-deep: #6b5628;
+    --gold-glow: rgba(201, 169, 97, 0.3);
+    --bg-black: #0a0a0a; --bg-dark: #141414; --bg-card: #1a1a1a; --bg-card-hover: #1f1f1f;
+    --text-white: #fff; --text-muted: #888; --text-dim: #555;
+    --green: #6bcf8a; --red: #e87373;
+    --orange-required: #f6b26b; --orange-glow: rgba(246, 178, 107, 0.35);
+    --yellow-input: #fff2cc;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-black); color: var(--text-white);
+    overflow-x: hidden; line-height: 1.6; font-feature-settings: 'tnum' 1;
+}
+body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image:
+        linear-gradient(rgba(201,169,97,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,169,97,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 1;
+}
+.bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; opacity: 0.12; }
+.bg-orb.o1 { width: 500px; height: 500px; background: var(--gold); top: 10%; left: -10%; }
+.bg-orb.o2 { width: 400px; height: 400px; background: var(--gold-bright); top: 60%; right: -10%; }
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-bright));
+    z-index: 1000; transition: width 0.1s ease; box-shadow: 0 0 10px var(--gold-glow); width: 0;
+}
+
+/* ── Navigation ────────────────────────── */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 1.2rem 3rem; display: flex;
+    justify-content: space-between; align-items: center;
+    z-index: 100; background: rgba(10,10,10,0.75);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,169,97,0.1);
+}
+.logo-img { height: 36px; width: auto; display: block; }
+.nav-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.nav-badge {
+    padding: 0.5rem 1rem; background: rgba(201,169,97,0.1);
+    border: 1px solid rgba(201,169,97,0.3); border-radius: 50px;
+    font-size: 0.72rem; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600;
+}
+.nav-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.3rem;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #000; border: none; border-radius: 12px;
+    font-family: inherit; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; transition: all 0.3s ease;
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.nav-btn:hover { background: linear-gradient(135deg, var(--gold), var(--gold-bright)); box-shadow: 0 4px 20px var(--gold-glow); }
+.nav-btn svg { width: 14px; height: 14px; }
+.nav-btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid rgba(201,169,97,0.25); }
+.nav-btn-ghost:hover { background: rgba(201,169,97,0.08); border-color: var(--gold); color: var(--gold); box-shadow: none; }
+
+.content { max-width: 1400px; width: 100%; margin: 0 auto; }
+.section { padding: 6rem 2rem 3rem; position: relative; z-index: 2; }
+
+/* ── Hero ────────────────────────── */
+.section.hero-section { min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 8rem 2rem 3rem; }
+.hero { text-align: center; padding: 2rem 0 1rem; position: relative; }
+.hero::before {
+    content: '∑'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); font-size: clamp(18rem, 36vw, 28rem);
+    font-weight: 900; color: rgba(201,169,97,0.03); z-index: -1;
+    letter-spacing: -0.05em; pointer-events: none; font-family: 'Playfair Display', serif;
+}
+.hero-badge {
+    display: inline-block; padding: 0.6rem 1.5rem;
+    background: rgba(201,169,97,0.1); border: 1px solid rgba(201,169,97,0.3);
+    border-radius: 50px; font-size: 0.8rem; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.3em;
+    margin-bottom: 2.5rem; font-weight: 600;
+}
+.hero h1 { font-size: clamp(3rem, 7vw, 6rem); font-weight: 900; line-height: 0.95; margin-bottom: 1.8rem; letter-spacing: -0.03em; }
+.hero h1 .line1 { display: block; background: linear-gradient(180deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero h1 .line2 { display: block; background: linear-gradient(135deg, var(--gold-dark), var(--gold) 50%, var(--gold-bright)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero .subtitle { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--text-muted); margin: 0 auto 2rem; font-weight: 300; max-width: 720px; }
+
+/* ── Section labels ────────────────────────── */
+.section-label {
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    padding: 0.5rem 1.2rem; background: rgba(201,169,97,0.08);
+    border: 1px solid rgba(201,169,97,0.25); border-radius: 50px;
+    font-size: 0.75rem; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.25em;
+    margin-bottom: 1.5rem; font-weight: 600;
+}
+.section-label::before { content: ''; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); }
+h2.section-h2 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1rem; }
+h3.section-h3 { font-size: clamp(1.2rem, 2vw, 1.6rem); font-weight: 600; margin: 2rem 0 0.8rem; }
+.gold-text { background: linear-gradient(135deg, var(--gold), var(--gold-bright)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ── Card ────────────────────────── */
+.calculator {
+    background: linear-gradient(135deg, var(--bg-card), #0f0f0f);
+    border: 1px solid rgba(201,169,97,0.25); border-radius: 24px;
+    padding: 2.5rem; margin: 1.5rem 0; position: relative; overflow: hidden;
+}
+.calculator::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-bright));
+}
+
+/* ── Tab Bar (main sections) ────────────────────────── */
+.main-tabs {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+    background: linear-gradient(135deg, var(--bg-card), #0f0f0f);
+    padding: 0.5rem; border-radius: 16px;
+    border: 1px solid rgba(201,169,97,0.15);
+    margin-bottom: 1.5rem;
+}
+.main-tabs .tab-btn {
+    flex: 1; min-width: 130px; padding: 0.85rem 0.9rem;
+    background: transparent; border: none; color: var(--text-muted);
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    border-radius: 12px; transition: all 0.3s ease;
+    font-family: inherit; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.main-tabs .tab-btn:hover { color: #ccc; }
+.main-tabs .tab-btn.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #000; box-shadow: 0 4px 20px var(--gold-glow);
+}
+
+/* ── Year Tab Switch ────────────────────────── */
+.tab-switch {
+    display: flex; gap: 0.5rem; margin: 0 0 2rem;
+    background: linear-gradient(135deg, var(--bg-card), #0f0f0f);
+    padding: 0.5rem; border-radius: 16px;
+    border: 1px solid rgba(201,169,97,0.15);
+    max-width: 480px; flex-wrap: wrap;
+}
+.tab-switch .tab-btn {
+    flex: 1; min-width: 140px; padding: 1rem 1.5rem;
+    background: transparent; border: none; color: var(--text-muted);
+    font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    border-radius: 12px; transition: all 0.3s ease; font-family: inherit;
+}
+.tab-switch .tab-btn:hover { color: #ccc; }
+.tab-switch .tab-btn.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #000; box-shadow: 0 4px 20px var(--gold-glow);
+}
+.tab-switch .tab-btn small { display: block; font-size: 0.7rem; font-weight: 500; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.75; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ── Customer bar ────────────────────────── */
+.customer-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 0 0 2rem; }
+.input-label { display: block; font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.7rem; font-weight: 600; }
+.input-label small { color: var(--text-muted); font-size: 0.72rem; text-transform: none; letter-spacing: 0; font-weight: 400; display: block; margin-top: 0.25rem; }
+.calc-input, .calc-select {
+    width: 100%; padding: 0.95rem 1.2rem; background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(201,169,97,0.2); border-radius: 12px;
+    color: var(--text-white); font-size: 1.02rem; font-weight: 600;
+    font-family: inherit; transition: all 0.25s ease; font-feature-settings: 'tnum' 1;
+}
+.calc-input:focus, .calc-select:focus { outline: none; border-color: var(--gold); background: rgba(0,0,0,0.6); box-shadow: 0 0 0 4px rgba(201,169,97,0.1); }
+.calc-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23c9a961' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 1.2rem center; padding-right: 2.8rem;
+}
+
+textarea.calc-input { min-height: 100px; resize: vertical; line-height: 1.6; font-weight: 400; font-size: 0.95rem; }
+
+/* ── Legend ────────────────────────── */
+.legend {
+    display: flex; flex-wrap: wrap; gap: 1rem 2rem;
+    margin: 0 0 2rem; padding: 1.2rem 1.5rem;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(201,169,97,0.12);
+    border-radius: 16px; align-items: center;
+}
+.legend-item { display: flex; align-items: center; gap: 0.7rem; font-size: 0.82rem; color: var(--text-muted); }
+.legend-swatch { width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+.legend-swatch.required { background: var(--orange-required); box-shadow: 0 0 12px var(--orange-glow); }
+.legend-swatch.input { background: var(--yellow-input); }
+.legend-swatch.calc { background: rgba(201,169,97,0.15); border-color: rgba(201,169,97,0.3); }
+
+/* ── Tables ────────────────────────── */
+.table-wrap {
+    background: linear-gradient(135deg, var(--bg-card), #0f0f0f);
+    border: 1px solid rgba(201,169,97,0.15); border-radius: 20px;
+    overflow: hidden; margin: 1.5rem 0; position: relative;
+}
+.table-wrap::before, .table-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 0;
+    width: 24px; pointer-events: none; z-index: 4;
+    opacity: 0; transition: opacity 0.25s ease;
+}
+.table-wrap::before { left: 0; background: linear-gradient(90deg, rgba(0,0,0,0.6), transparent); }
+.table-wrap::after  { right: 0; background: linear-gradient(-90deg, rgba(0,0,0,0.6), transparent); }
+.table-wrap.has-scroll-left::before { opacity: 1; }
+.table-wrap.has-scroll-right::after { opacity: 1; }
+.table-scroll {
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: thin; scrollbar-color: rgba(201,169,97,0.3) transparent;
+}
+.table-scroll::-webkit-scrollbar { height: 8px; }
+.table-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+.table-scroll::-webkit-scrollbar-thumb { background: rgba(201,169,97,0.3); border-radius: 4px; }
+.table-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201,169,97,0.5); }
+
+.data-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    min-width: 760px; font-size: 0.82rem;
+}
+.data-table thead th {
+    padding: 0.9rem 0.7rem; text-align: right; background: #151510;
+    color: var(--gold); font-weight: 600; font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    border-bottom: 1px solid rgba(201,169,97,0.18);
+    white-space: nowrap; position: sticky; top: 0; z-index: 2;
+}
+.data-table thead th:first-child { text-align: left; min-width: 240px; }
+.data-table thead th:last-child { color: var(--gold-bright); }
+.data-table tbody td {
+    padding: 0.4rem 0.5rem; text-align: right;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #d4d4d8; white-space: nowrap;
+    font-feature-settings: 'tnum' 1; font-size: 0.82rem;
+}
+.data-table tbody td:first-child {
+    text-align: left; color: var(--text-white); font-weight: 600; padding-left: 1.1rem;
+}
+.data-table tbody tr:hover { background: rgba(201,169,97,0.025); }
+
+.data-table.sticky-cols thead th:first-child,
+.data-table.sticky-cols tbody td:first-child {
+    position: sticky; left: 0; z-index: 3;
+}
+.data-table.sticky-cols thead th:first-child { z-index: 5; background: #151510; }
+.data-table.sticky-cols tbody td:first-child { background: linear-gradient(90deg, #15140f 85%, rgba(21,20,15,0.95) 100%); }
+.data-table.sticky-cols thead th:last-child,
+.data-table.sticky-cols tbody td:last-child {
+    position: sticky; right: 0; z-index: 3;
+}
+.data-table.sticky-cols thead th:last-child { z-index: 5; }
+.data-table.sticky-cols tbody td:last-child {
+    background: linear-gradient(-90deg, #15140f 85%, rgba(21,20,15,0.95) 100%);
+    font-weight: 700; color: var(--gold-bright);
+}
+
+/* Total row */
+.data-table tfoot tr td, .data-table tbody tr.total-row td {
+    background: #1f1c13 !important; color: var(--gold);
+    font-weight: 700; border-top: 1px solid rgba(201,169,97,0.3);
+}
+.data-table tfoot tr td:first-child, .data-table tbody tr.total-row td:first-child { color: var(--gold-bright); }
+
+/* Section/subsection rows */
+.row-section td {
+    background: linear-gradient(90deg, rgba(27,58,107,0.35), rgba(27,58,107,0.05)) !important;
+    color: var(--gold-bright) !important; font-weight: 700 !important;
+    font-size: 0.82rem !important; text-transform: uppercase;
+    letter-spacing: 0.15em; padding: 0.85rem 1.1rem !important;
+    border-bottom: 1px solid rgba(201,169,97,0.2) !important;
+}
+.row-subsection td {
+    background: linear-gradient(90deg, rgba(46,109,164,0.18), transparent) !important;
+    color: var(--gold) !important; font-weight: 600 !important;
+    font-size: 0.74rem !important; text-transform: uppercase;
+    letter-spacing: 0.18em; padding: 0.65rem 1.1rem !important;
+}
+.row-section td:first-child, .row-subsection td:first-child { background: inherit !important; }
+
+/* ── Cell inputs ────────────────────────── */
+.cell-input {
+    width: 100px; padding: 0.45rem 0.6rem;
+    background: rgba(0,0,0,0.4); border: 1px solid transparent;
+    border-radius: 6px; color: var(--text-white); font-family: inherit;
+    font-size: 0.82rem; font-weight: 600; text-align: right;
+    transition: all 0.2s ease; font-feature-settings: 'tnum' 1;
+}
+.cell-input.text { text-align: left; width: 180px; }
+.cell-input::placeholder { color: var(--text-dim); font-weight: 400; }
+.cell-input:hover { border-color: rgba(201,169,97,0.25); background: rgba(0,0,0,0.5); }
+.cell-input:focus { outline: none; border-color: var(--gold); background: rgba(0,0,0,0.7); box-shadow: 0 0 0 2px rgba(201,169,97,0.15); }
+
+.cell-input.input-yellow { background: rgba(255,242,204,0.07); border-color: rgba(255,242,204,0.18); }
+.cell-input.input-yellow:hover { background: rgba(255,242,204,0.12); border-color: rgba(255,242,204,0.4); }
+.cell-input.input-yellow:focus { background: rgba(255,242,204,0.16); border-color: var(--yellow-input); box-shadow: 0 0 0 2px rgba(255,242,204,0.2); }
+
+.cell-input.input-orange {
+    background: rgba(246,178,107,0.1);
+    border: 1px solid rgba(246,178,107,0.55);
+    box-shadow: inset 0 0 0 1px rgba(246,178,107,0.15);
+}
+.cell-input.input-orange:hover { background: rgba(246,178,107,0.18); border-color: var(--orange-required); }
+.cell-input.input-orange:focus { background: rgba(246,178,107,0.22); border-color: var(--orange-required); box-shadow: 0 0 0 3px var(--orange-glow); }
+
+.row-label-required {
+    border-left: 3px solid var(--orange-required) !important;
+    padding-left: calc(1.1rem - 3px) !important;
+}
+.row-label-required::after {
+    content: 'PFLICHT'; display: inline-block; margin-left: 0.6rem;
+    padding: 0.12rem 0.5rem; background: rgba(246,178,107,0.18);
+    border: 1px solid rgba(246,178,107,0.5); border-radius: 50px;
+    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.15em;
+    color: var(--orange-required); text-transform: uppercase; vertical-align: middle;
+}
+.row-label-input { border-left: 3px solid rgba(255,242,204,0.4) !important; padding-left: calc(1.1rem - 3px) !important; }
+
+.calc-cell {
+    color: var(--gold); font-weight: 600; padding: 0.45rem 0.6rem;
+    display: inline-block; min-width: 100px; text-align: right;
+    border-radius: 6px; background: rgba(201,169,97,0.05);
+    border: 1px dashed rgba(201,169,97,0.18);
+}
+.calc-cell.pos { color: var(--green); }
+.calc-cell.neg { color: var(--red); }
+
+/* ── KPI Tiles ────────────────────────── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; margin: 1.5rem 0 2rem; }
+.kpi-card {
+    background: linear-gradient(135deg, var(--bg-card), #0f0f0f);
+    border: 1px solid rgba(201,169,97,0.15);
+    border-radius: 16px; padding: 1.6rem 1.5rem;
+    position: relative; overflow: hidden; transition: border-color 0.3s ease;
+}
+.kpi-card:hover { border-color: rgba(201,169,97,0.35); }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.5; }
+.kpi-card.accent::before { background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-bright)); opacity: 1; height: 3px; }
+.kpi-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.9rem; font-weight: 600; }
+.kpi-card.accent .kpi-label { color: var(--gold); }
+.kpi-value { font-size: 1.85rem; font-weight: 800; color: var(--text-white); letter-spacing: -0.02em; font-feature-settings: 'tnum' 1; }
+.kpi-card.accent .kpi-value {
+    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.kpi-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+.actions-row { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 2rem 0 0; justify-content: flex-end; }
+.helper-text { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; margin: 0.5rem 0 1.5rem; max-width: 760px; }
+
+footer.site-footer {
+    padding: 3rem 2rem 2rem; text-align: center;
+    color: var(--text-dim); font-size: 0.78rem;
+    border-top: 1px solid rgba(201,169,97,0.08);
+    margin-top: 4rem; position: relative; z-index: 2;
+}
+footer.site-footer a { color: var(--gold); text-decoration: none; }
+
+/* ── Responsive ────────────────────────── */
+@media (max-width: 768px) {
+    .top-nav { padding: 1rem 1.2rem; flex-wrap: wrap; gap: 0.5rem; }
+    .nav-badge { display: none; }
+    .section { padding: 5rem 1rem 2rem; }
+    .section.hero-section { padding-top: 7rem; min-height: auto; }
+    .calculator { padding: 1.5rem; border-radius: 20px; }
+    .main-tabs .tab-btn { min-width: 110px; padding: 0.7rem 0.6rem; font-size: 0.7rem; }
+    .tab-switch .tab-btn { min-width: auto; padding: 0.8rem; font-size: 0.8rem; }
+    .tab-switch .tab-btn small { display: none; }
+    .kpi-value { font-size: 1.5rem; }
+    .hero h1 { font-size: clamp(2.2rem, 9vw, 3.5rem); }
+    .nav-btn { padding: 0.6rem 1rem; font-size: 0.72rem; }
+    .cell-input { width: 86px; }
+    .cell-input.text { width: 140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orb o1"></div>
+<div class="bg-orb o2"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="top-nav">
+    <a href="https://www.langconsulting.de" target="_blank" rel="noopener" class="logo-link">
+        <img src="https://cdn.prod.website-files.com/66058614773c08ca255f28f0/662a2886c0cec9cf0e98029b_lang-gold-logo.svg" alt="Lang Consulting" class="logo-img">
+    </a>
+    <div class="nav-right">
+        <div class="nav-badge">North Star Metrics</div>
+        <button class="nav-btn nav-btn-ghost" id="btnReset" title="Alle Eingaben zurücksetzen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Reset
+        </button>
+        <button class="nav-btn" id="btnExportXlsx">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Excel
+        </button>
+        <button class="nav-btn" id="btnExportPdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            PDF
+        </button>
+    </div>
+</nav>
+
+<section class="section hero-section">
+    <div class="content">
+        <div class="hero">
+            <div class="hero-badge">Kunden-Tracking</div>
+            <h1>
+                <span class="line1">North Star Metrics</span>
+                <span class="line2">Monat für Monat im Griff</span>
+            </h1>
+            <p class="subtitle">Komplettes E-Commerce-Tracking: Monatsdaten, Dashboard, Kanal- &amp; Kohorten-Analyse, Jahresvergleich und Einschätzung — alles auf einer Seite, mit Excel- und PDF-Export.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" style="padding-top:2rem">
+    <div class="content">
+
+        <!-- Customer info -->
+        <div class="calculator" style="padding:1.8rem 2.5rem">
+            <div class="customer-bar" style="margin: 0">
+                <div>
+                    <label class="input-label" for="inpShop">Shop-Domain</label>
+                    <input type="text" class="calc-input" id="inpShop" placeholder="z.B. meinshop.de">
+                </div>
+                <div>
+                    <label class="input-label" for="inpCustomer">Kundenname</label>
+                    <input type="text" class="calc-input" id="inpCustomer" placeholder="Mustermann GmbH">
+                </div>
+            </div>
+        </div>
+
+        <!-- Main tab navigation -->
+        <div class="main-tabs" role="tablist">
+            <button class="tab-btn active" data-panel="monatsdaten">📅 Monatsdaten</button>
+            <button class="tab-btn" data-panel="dashboard">🎯 Dashboard</button>
+            <button class="tab-btn" data-panel="kanal">📡 Kanal-Analyse</button>
+            <button class="tab-btn" data-panel="jahresvergleich">📊 Jahresvergleich</button>
+            <button class="tab-btn" data-panel="produktgruppen">📦 Produktgruppen</button>
+            <button class="tab-btn" data-panel="nkbk">🆚 NK vs. BK</button>
+            <button class="tab-btn" data-panel="kohorten">👥 Kohorten</button>
+            <button class="tab-btn" data-panel="einschaetzung">📝 Einschätzung</button>
+        </div>
+
+        <!-- ========================================================
+             PANEL: MONATSDATEN (input)
+             ======================================================== -->
+        <div class="tab-panel active" id="panel-monatsdaten">
+            <div class="section-label">Eingabe</div>
+            <h2 class="section-h2">Monats-<span class="gold-text">Übersicht</span></h2>
+            <p class="helper-text">Trage hier deine Monatswerte ein. <strong style="color:var(--orange-required)">Orange</strong> = Pflichtfeld, <strong style="color:var(--yellow-input)">Gelb</strong> = Standard-Eingabe. Alle anderen Bereiche der App füllen sich automatisch.</p>
+
+            <div class="calculator">
+                <div class="tab-switch">
+                    <button class="tab-btn active" data-year="2025" type="button">Geschäftsjahr 2025<small>12 Monate</small></button>
+                    <button class="tab-btn" data-year="2026" type="button">Geschäftsjahr 2026<small>12 Monate</small></button>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-swatch required"></span><span><strong style="color:var(--orange-required)">Orange</strong> · Pflichtfeld</span></div>
+                    <div class="legend-item"><span class="legend-swatch input"></span><span><strong style="color:var(--yellow-input)">Gelb</strong> · Standard-Eingabe</span></div>
+                    <div class="legend-item"><span class="legend-swatch calc"></span><span><strong style="color:var(--gold)">Gold</strong> · automatisch berechnet</span></div>
+                </div>
+
+                <div class="table-wrap" id="wrap-monatsdaten">
+                    <div class="table-scroll">
+                        <table class="data-table sticky-cols" id="tableMonatsdaten">
+                            <thead><tr id="theadMonatsdaten"></tr></thead>
+                            <tbody id="tbodyMonatsdaten"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Jahres-<span class="gold-text">Kennzahlen</span></h3>
+                <div class="kpi-grid" id="kpiGrid"></div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: DASHBOARD
+             ======================================================== -->
+        <div class="tab-panel" id="panel-dashboard">
+            <div class="section-label">Dashboard</div>
+            <h2 class="section-h2">Aktuelle <span class="gold-text">Kennzahlen</span></h2>
+            <p class="helper-text">Wähle einen Monat — alle Werte stammen direkt aus den Monatsdaten und vergleichen den ausgewählten Monat mit der Jahres-Summe / dem Jahres-Durchschnitt.</p>
+
+            <div class="calculator">
+                <div class="customer-bar" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div>
+                        <label class="input-label" for="dashYear">Geschäftsjahr</label>
+                        <select class="calc-select" id="dashYear">
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="input-label" for="dashMonth">Monat auswählen</label>
+                        <select class="calc-select" id="dashMonth"></select>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table" id="tableDashboard">
+                            <thead><tr><th>KPI</th><th>Monatswert</th><th>Jahres-Summe / Ø</th><th>Einheit</th><th>Hinweis</th></tr></thead>
+                            <tbody id="tbodyDashboard"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: KANAL-ANALYSE
+             ======================================================== -->
+        <div class="tab-panel" id="panel-kanal">
+            <div class="section-label">Kanal-Analyse</div>
+            <h2 class="section-h2">Performance je <span class="gold-text">Kanal</span></h2>
+            <p class="helper-text">Werte kommen automatisch aus den Monatsdaten (E-Mail, Google, Meta, Pinterest, TikTok). Zusätzlich kannst du weitere Kanäle wie SEO/Direkt/Affiliate manuell ergänzen.</p>
+
+            <div class="calculator">
+                <div class="customer-bar" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div>
+                        <label class="input-label" for="kanalYear">Geschäftsjahr</label>
+                        <select class="calc-select" id="kanalYear">
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Kanal-<span class="gold-text">Rentabilität</span></h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table" id="tableKanalRent">
+                            <thead><tr><th>Werbekanal</th><th>Umsatz (€)</th><th>Werbekosten (€)</th><th>ROAS</th><th>Deckungsbeitrag (€)</th><th>DB-Marge (%)</th><th>Umsatzanteil (%)</th></tr></thead>
+                            <tbody id="tbodyKanalRent"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Kanal-<span class="gold-text">Detail</span> (monatlich)</h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table sticky-cols" id="tableKanalDetail">
+                            <thead><tr id="theadKanalDetail"></tr></thead>
+                            <tbody id="tbodyKanalDetail"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: JAHRESVERGLEICH
+             ======================================================== -->
+        <div class="tab-panel" id="panel-jahresvergleich">
+            <div class="section-label">Jahresvergleich</div>
+            <h2 class="section-h2">KPI-<span class="gold-text">Übersicht</span> 2023 – 2028</h2>
+            <p class="helper-text">2025 &amp; 2026 werden automatisch aus den Monatsdaten berechnet (Gold). Andere Jahre kannst du manuell eintragen — die Spalte wird gelb hervorgehoben.</p>
+
+            <div class="calculator">
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table sticky-cols" id="tableJahresvergleich">
+                            <thead><tr id="theadJahresvergleich"></tr></thead>
+                            <tbody id="tbodyJahresvergleich"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: PRODUKTGRUPPEN
+             ======================================================== -->
+        <div class="tab-panel" id="panel-produktgruppen">
+            <div class="section-label">Produktgruppen</div>
+            <h2 class="section-h2">Umsatz &amp; Rentabilität pro <span class="gold-text">Produktgruppe</span></h2>
+            <p class="helper-text">Definiere bis zu 6 Produktgruppen mit Umsatz und Werbekosten. Anteil, DB und Marge werden automatisch berechnet.</p>
+
+            <div class="calculator">
+                <h3 class="section-h3">Produktgruppen-<span class="gold-text">Übersicht</span></h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table" id="tableProduktgruppen">
+                            <thead><tr><th>Produktgruppe</th><th>Umsatz (€)</th><th>Umsatzanteil (%)</th><th>Werbekosten (€)</th><th>Deckungsbeitrag (€)</th><th>DB-Marge (%)</th></tr></thead>
+                            <tbody id="tbodyProduktgruppen"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Monatliche <span class="gold-text">Entwicklung</span></h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table sticky-cols" id="tableProduktMonate">
+                            <thead><tr id="theadProduktMonate"></tr></thead>
+                            <tbody id="tbodyProduktMonate"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: NK vs BK
+             ======================================================== -->
+        <div class="tab-panel" id="panel-nkbk">
+            <div class="section-label">NK vs. BK</div>
+            <h2 class="section-h2">Neukunden vs. <span class="gold-text">Bestandskunden</span></h2>
+            <p class="helper-text">Die Anzahl Orders kommt aus den Monatsdaten. Umsatz und Werbekosten je Kundengruppe trägst du hier ein.</p>
+
+            <div class="calculator">
+                <div class="customer-bar" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div>
+                        <label class="input-label" for="nkbkYear">Geschäftsjahr</label>
+                        <select class="calc-select" id="nkbkYear">
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Gesamt-<span class="gold-text">Vergleich</span></h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table" id="tableNKBKtotal">
+                            <thead><tr><th>Kundentyp</th><th>Umsatz (€)</th><th>Anteil (%)</th><th>Werbekosten (€)</th><th>DB (€)</th><th>DB-Marge (%)</th><th>Bestellungen</th><th>Ø Bestellwert (€)</th></tr></thead>
+                            <tbody id="tbodyNKBKtotal"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="section-h3">Monatliche <span class="gold-text">Entwicklung</span></h3>
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table sticky-cols" id="tableNKBKmonate">
+                            <thead><tr><th>Monat</th><th>NK Umsatz (€)</th><th>BK Umsatz (€)</th><th>NK Anteil (%)</th><th>BK Anteil (%)</th><th>NK Werbekosten (€)</th><th>BK Werbekosten (€)</th></tr></thead>
+                            <tbody id="tbodyNKBKmonate"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: KOHORTEN
+             ======================================================== -->
+        <div class="tab-panel" id="panel-kohorten">
+            <div class="section-label">Kohortenanalyse</div>
+            <h2 class="section-h2">Kunden nach <span class="gold-text">Erstkauf-Monat</span></h2>
+            <p class="helper-text">Eine Kohorte = alle Kunden mit demselben Erstkaufmonat. Trage Anzahl Kunden, kumulierten Umsatz und Werbekosten ein. Pro-Kunde-Werte und DB werden berechnet.</p>
+
+            <div class="calculator">
+                <div class="table-wrap">
+                    <div class="table-scroll">
+                        <table class="data-table" id="tableKohorten">
+                            <thead><tr><th>Kohorte (MM/JJJJ)</th><th>Anzahl Kunden</th><th>Umsatz gesamt (€)</th><th>Umsatz/Kunde (€)</th><th>Werbekosten (€)</th><th>DB (€)</th><th>DB/Kunde (€)</th><th>Wiederkaufrate (%)</th></tr></thead>
+                            <tbody id="tbodyKohorten"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="actions-row" style="justify-content:flex-start">
+                    <button class="nav-btn nav-btn-ghost" id="btnAddKohorte">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Kohorte hinzufügen
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             PANEL: EINSCHÄTZUNG
+             ======================================================== -->
+        <div class="tab-panel" id="panel-einschaetzung">
+            <div class="section-label">Einschätzung</div>
+            <h2 class="section-h2">Einschätzung &amp; <span class="gold-text">Offene Punkte</span></h2>
+            <p class="helper-text">Qualitative Einschätzung des Berichtszeitraums — fließt mit in den PDF-Export.</p>
+
+            <div class="calculator">
+                <div class="customer-bar" style="grid-template-columns: 1fr;">
+                    <div>
+                        <label class="input-label" for="ein_zeitraum">📅 Zeitraum / Berichtsmonat</label>
+                        <input type="text" class="calc-input" id="ein_zeitraum" placeholder="z.B. Januar 2026">
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_skalieren">✅ Welche Kanäle skalieren aktuell gut?</label>
+                        <textarea class="calc-input" id="ein_skalieren" placeholder="z.B. Google Ads – ROAS >4, stabile CPAs; Meta – steigender DB ..."></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_grenzwertig">⚠️ Welche Kanäle sind grenzwertig oder unrentabel?</label>
+                        <textarea class="calc-input" id="ein_grenzwertig" placeholder="z.B. Pinterest – zu wenig Traffic, ROAS <1; TikTok – ..."></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_produkte">📦 Welche Produktgruppen tragen den Großteil des Geschäfts?</label>
+                        <textarea class="calc-input" id="ein_produkte" placeholder="z.B. Kategorie A = 65% des DB; Kategorie C kaum Marge ..."></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_luecken">📉 Wo bestehen aktuell Datenlücken oder Unsicherheiten?</label>
+                        <textarea class="calc-input" id="ein_luecken" placeholder="z.B. Attributionsprobleme Meta vs. Google; CLV-Daten ..."></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_beobachtungen">🔍 Weitere Beobachtungen / Auffälligkeiten</label>
+                        <textarea class="calc-input" id="ein_beobachtungen"></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_massnahmen">🚀 Geplante Maßnahmen nächster Monat</label>
+                        <textarea class="calc-input" id="ein_massnahmen"></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label" for="ein_offen">❓ Offene Fragen / Nächste Schritte</label>
+                        <textarea class="calc-input" id="ein_offen"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action footer -->
+        <div class="actions-row">
+            <button class="nav-btn nav-btn-ghost" id="btnReset2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                Alles zurücksetzen
+            </button>
+            <button class="nav-btn" id="btnExportXlsx2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Excel exportieren
+            </button>
+            <button class="nav-btn" id="btnExportPdf2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                PDF exportieren
+            </button>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <p>© Lang Consulting · <a href="https://www.langconsulting.de" target="_blank" rel="noopener">langconsulting.de</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+/* =================================================================
+   ROW DEFINITIONS — Monatsdaten
+   ================================================================= */
+const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const CHANNELS = [
+    { key: 'email',     label: 'E-Mail' },
+    { key: 'google',    label: 'Google Ads' },
+    { key: 'meta',      label: 'Meta Ads' },
+    { key: 'pinterest', label: 'Pinterest' },
+    { key: 'tiktok',    label: 'TikTok' }
+];
+const EXTRA_CHANNELS = ['SEO / Organisch','Marktplätze','Affiliates','Direkt / Sonstiges'];
+const PRODUCT_GROUPS_DEFAULT = ['Produktgruppe 1','Produktgruppe 2','Produktgruppe 3','Produktgruppe 4','Produktgruppe 5','Sonstiges'];
+const COMPARE_YEARS = [2023, 2024, 2025, 2026, 2027, 2028];
+
+const ROWS = [
+    { type: 'section', label: '💰  Finanzkennzahlen' },
+    { id: 'umsatz_netto',     label: 'Umsatz Netto (€)',                type: 'input',    format: 'eur', total: 'sum' },
+    { id: 'wareneinsatz',     label: 'Wareneinsatz (€)',                type: 'required', format: 'eur', total: 'sum' },
+    { id: 'rohertrag',        label: 'Rohertrag (€)',                   type: 'calc',     format: 'eur', total: 'sum',
+      calc: (i, g) => (g('umsatz_netto', i) ?? 0) - (g('wareneinsatz', i) ?? 0) },
+    { id: 'rohertrag_pct',    label: 'Rohertrag in %',                  type: 'calc',     format: 'pct', total: 'calc',
+      calc: (i, g) => { const u = g('umsatz_netto', i); const r = (u ?? 0) - (g('wareneinsatz', i) ?? 0); return u ? r/u : null; },
+      totalCalc: g => { const u = g.sum('umsatz_netto'); const r = u - g.sum('wareneinsatz'); return u ? r/u : null; } },
+    { id: 'ebit',             label: 'EBIT (€)',                        type: 'required', format: 'eur', total: 'sum' },
+    { id: 'aktive_kaeufer',   label: 'Anzahl aktiver Käufer',           type: 'required', format: 'num', total: 'avgNonZero' },
+    { id: 'ebit_per_kunde',   label: 'EBIT pro Kunde (€)',              type: 'calc',     format: 'eur', total: 'calc',
+      calc: (i, g) => { const k = g('aktive_kaeufer', i); return k ? (g('ebit', i) ?? 0) / k : null; },
+      totalCalc: g => { const k = g.avgNonZero('aktive_kaeufer'); return k ? g.sum('ebit') / 12 / k : null; } },
+    { id: 'rohertrag_marge',  label: 'Rohertrag-Marge (%)',             type: 'calc',     format: 'pct', total: 'calc',
+      calc: (i, g) => { const u = g('umsatz_netto', i); const r = (u ?? 0) - (g('wareneinsatz', i) ?? 0); return u ? r/u : null; },
+      totalCalc: g => { const u = g.sum('umsatz_netto'); const r = u - g.sum('wareneinsatz'); return u ? r/u : null; } },
+    { id: 'ebit_marge',       label: 'EBIT-Marge (%)',                  type: 'calc',     format: 'pct', total: 'calc',
+      calc: (i, g) => { const u = g('umsatz_netto', i); return u ? (g('ebit', i) ?? 0) / u : null; },
+      totalCalc: g => { const u = g.sum('umsatz_netto'); return u ? g.sum('ebit') / u : null; } },
+
+    { type: 'section', label: '🛒  Orders & Kunden' },
+    { id: 'bestellungen_gesamt', label: 'Bestellungen gesamt',          type: 'required', format: 'num', total: 'sum' },
+    { id: 'orders_nk',           label: '↳ davon Neukunden-Orders',    type: 'required', format: 'num', total: 'sum' },
+    { id: 'orders_bk',           label: '↳ davon Bestandskunden-Orders', type: 'required', format: 'num', total: 'sum' },
+    { id: 'nk_quote',            label: 'NK-Quote (%)',                  type: 'calc',     format: 'pct', total: 'calc',
+      calc: (i,g) => { const b = g('bestellungen_gesamt', i); return b ? (g('orders_nk', i) ?? 0) / b : null; },
+      totalCalc: g => { const b = g.sum('bestellungen_gesamt'); return b ? g.sum('orders_nk') / b : null; } },
+    { id: 'orders_per_active',   label: 'Orders per Active Customer',    type: 'calc',     format: 'num', total: 'calc',
+      calc: (i,g) => { const k = g('aktive_kaeufer', i); return k ? (g('bestellungen_gesamt', i) ?? 0) / k : null; },
+      totalCalc: g => { const k = g.avgNonZero('aktive_kaeufer'); return k ? g.sum('bestellungen_gesamt') / 12 / k : null; } },
+    { id: 'aov',                 label: 'AOV – Ø Bestellwert (€)',       type: 'input',    format: 'eur', total: 'avgNonZero' },
+    { id: 'crr',                 label: 'CRR – Wiederkaufrate (%)',      type: 'input',    format: 'pct', total: 'avgNonZero' },
+    { id: 'clv',                 label: 'CLV – Customer Lifetime Value (€)', type: 'input', format: 'eur', total: 'avgNonZero' },
+
+    { type: 'section', label: '📈  Traffic gesamt' },
+    { id: 'traffic_total',  label: 'Traffic gesamt (Sessions)',         type: 'required', format: 'num', total: 'sum' },
+    { id: 'cr',             label: 'CR – Conversion Rate (%)',          type: 'required', format: 'pct', total: 'avgNonZero' },
+
+    { type: 'subsection', label: '📡  Traffic pro Kanal' },
+    ...CHANNELS.map(c => ({ id: 'traffic_'+c.key, label: c.label, type: 'input', format: 'num', total: 'sum' })),
+
+    { type: 'subsection', label: '💶  Umsatz pro Kanal' },
+    ...CHANNELS.map(c => ({ id: 'umsatz_'+c.key, label: c.label + ' (€)', type: 'input', format: 'eur', total: 'sum' })),
+
+    { type: 'subsection', label: '📊  Deckungsbeitrag pro Kanal' },
+    ...CHANNELS.flatMap(c => ([
+        { id: 'wk_'+c.key, label: 'Werbekosten '+c.label+' (€)', type: 'input', format: 'eur', total: 'sum' },
+        { id: 'db_'+c.key, label: 'DB '+c.label+' (€)', type: 'calc', format: 'eur', total: 'calc',
+          calc: (i,g) => (g('umsatz_'+c.key, i) ?? 0) - (g('wk_'+c.key, i) ?? 0),
+          totalCalc: g => g.sum('umsatz_'+c.key) - g.sum('wk_'+c.key) },
+        { id: 'dbm_'+c.key, label: 'DB-Marge '+c.label+' (%)', type: 'calc', format: 'pct', total: 'calc',
+          calc: (i,g) => { const u = g('umsatz_'+c.key, i); return u ? ((u - (g('wk_'+c.key, i) ?? 0)) / u) : null; },
+          totalCalc: g => { const u = g.sum('umsatz_'+c.key); return u ? (u - g.sum('wk_'+c.key)) / u : null; } }
+    ]))
+];
+
+/* =================================================================
+   STATE
+   ================================================================= */
+const STORAGE_KEY = 'lc_north_star_v2';
+const state = loadState() || defaultState();
+
+function defaultState() {
+    return {
+        activeYear: '2025',
+        dashboard: { year: '2025', month: 0 },
+        kanal: { year: '2025', extra: {} },     // extra[year][channelName] = { umsatz, wk }
+        produkt: { groups: [...PRODUCT_GROUPS_DEFAULT], totals: {}, monthly: {} },
+        nkbk: { year: '2025', monthly: {} },    // monthly[year][month] = { nk_umsatz, bk_umsatz, nk_wk, bk_wk }
+        kohorten: [
+            { id: 1, kohorte: '', kunden: '', umsatz: '', wk: '', wkr: '' },
+            { id: 2, kohorte: '', kunden: '', umsatz: '', wk: '', wkr: '' },
+            { id: 3, kohorte: '', kunden: '', umsatz: '', wk: '', wkr: '' }
+        ],
+        einschaetzung: {
+            zeitraum: '', skalieren: '', grenzwertig: '', produkte: '',
+            luecken: '', beobachtungen: '', massnahmen: '', offen: ''
+        },
+        jahre: {},  // jahre[year][rowId] = number (only for non-2025/2026)
+        customer: { shop: '', name: '' },
+        data: { '2025': {}, '2026': {} }
+    };
+}
+
+function loadState() {
+    try {
+        const s = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!s) return null;
+        // ensure all keys
+        const def = defaultState();
+        for (const k of Object.keys(def)) if (s[k] === undefined) s[k] = def[k];
+        return s;
+    } catch (e) { return null; }
+}
+function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+/* ── Cell access for Monatsdaten ────────────────────── */
+function getCellY(year, rowId, monthIdx) {
+    const v = state.data[year]?.[rowId]?.[monthIdx];
+    return (v === undefined || v === null || v === '') ? null : Number(v);
+}
+function getCell(rowId, monthIdx) { return getCellY(state.activeYear, rowId, monthIdx); }
+function setCell(rowId, monthIdx, raw) {
+    if (!state.data[state.activeYear][rowId]) state.data[state.activeYear][rowId] = {};
+    if (raw === '' || raw === null || raw === undefined) {
+        delete state.data[state.activeYear][rowId][monthIdx];
+    } else {
+        state.data[state.activeYear][rowId][monthIdx] = raw;
+    }
+    saveState();
+}
+function aggFor(year) {
+    return {
+        sum: id => { let s = 0; for (let i=0;i<12;i++){ const v = getCellY(year, id, i); if (v!==null) s+=v; } return s; },
+        avgNonZero: id => {
+            let s=0,c=0;
+            for (let i=0;i<12;i++){ const v = getCellY(year, id, i); if (v!==null && v!==0){s+=v;c++;} }
+            return c ? s/c : 0;
+        }
+    };
+}
+const aggHelpers = aggFor(state.activeYear);
+function refreshAgg() { Object.assign(aggHelpers, aggFor(state.activeYear)); }
+
+/* =================================================================
+   FORMATTING
+   ================================================================= */
+const fmtEUR = n => (n===null || n===undefined || isNaN(n)) ? '–' : new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+const fmtNUM = n => (n===null || n===undefined || isNaN(n)) ? '–' : new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(n);
+const fmtNUM2 = n => (n===null || n===undefined || isNaN(n)) ? '–' : new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format(n);
+const fmtPCT = n => (n===null || n===undefined || isNaN(n)) ? '–' : new Intl.NumberFormat('de-DE',{style:'percent',maximumFractionDigits:1}).format(n);
+const fmtBy = (type, n) => type==='eur' ? fmtEUR(n) : type==='pct' ? fmtPCT(n) : fmtNUM(n);
+
+/* =================================================================
+   PANEL: Monatsdaten — render
+   ================================================================= */
+function renderMonatsdatenHead() {
+    const tr = document.getElementById('theadMonatsdaten');
+    tr.innerHTML = '';
+    tr.appendChild(Object.assign(document.createElement('th'),{textContent:'KPI'}));
+    MONTHS.forEach(m => tr.appendChild(Object.assign(document.createElement('th'),{textContent:m})));
+    tr.appendChild(Object.assign(document.createElement('th'),{textContent:'Gesamt / Ø'}));
+}
+function renderMonatsdatenBody() {
+    const tb = document.getElementById('tbodyMonatsdaten');
+    tb.innerHTML = '';
+    ROWS.forEach(row => {
+        const tr = document.createElement('tr');
+        if (row.type === 'section' || row.type === 'subsection') {
+            tr.className = row.type === 'section' ? 'row-section' : 'row-subsection';
+            const td = document.createElement('td'); td.colSpan = 14; td.textContent = row.label;
+            tr.appendChild(td); tb.appendChild(tr); return;
+        }
+        const tdLabel = document.createElement('td');
+        tdLabel.textContent = row.label;
+        if (row.type === 'required') tdLabel.className = 'row-label-required';
+        else if (row.type === 'input') tdLabel.className = 'row-label-input';
+        tr.appendChild(tdLabel);
+
+        for (let i=0; i<12; i++) {
+            const td = document.createElement('td');
+            if (row.type === 'input' || row.type === 'required') {
+                const inp = document.createElement('input');
+                inp.type = 'number'; inp.step = row.format === 'pct' ? '0.01' : 'any';
+                inp.className = 'cell-input ' + (row.type === 'required' ? 'input-orange' : 'input-yellow');
+                inp.dataset.row = row.id; inp.dataset.month = i;
+                const stored = state.data[state.activeYear]?.[row.id]?.[i];
+                if (stored !== undefined && stored !== null) inp.value = row.format === 'pct' ? (Number(stored) * 100) : stored;
+                inp.placeholder = row.format === 'eur' ? '€' : row.format === 'pct' ? '%' : '–';
+                inp.addEventListener('input', onInputMonatsdaten);
+                td.appendChild(inp);
+            } else {
+                const span = document.createElement('span');
+                span.className = 'calc-cell calc-' + row.id + '-' + i;
+                td.appendChild(span);
+            }
+            tr.appendChild(td);
+        }
+        const tdTotal = document.createElement('td');
+        const span = document.createElement('span');
+        span.className = 'calc-cell calc-total-' + row.id;
+        tdTotal.appendChild(span); tr.appendChild(tdTotal);
+        tb.appendChild(tr);
+    });
+}
+function onInputMonatsdaten(e) {
+    const inp = e.target;
+    const rowId = inp.dataset.row;
+    const monthIdx = parseInt(inp.dataset.month, 10);
+    const row = ROWS.find(r => r.id === rowId);
+    let raw = inp.value;
+    if (raw === '' || raw === null) {
+        setCell(rowId, monthIdx, '');
+    } else {
+        let n = Number(raw);
+        if (isNaN(n)) return;
+        if (row.format === 'pct') n = n / 100;
+        setCell(rowId, monthIdx, n);
+    }
+    refreshAgg();
+    recomputeMonatsdaten();
+    renderDashboard();
+    renderKanal();
+    renderJahresvergleich();
+    renderNKBK();
+}
+function recomputeMonatsdaten() {
+    refreshAgg();
+    ROWS.forEach(row => {
+        if (row.type !== 'calc' && row.type !== 'input' && row.type !== 'required') return;
+        if (row.type === 'calc') {
+            for (let i=0; i<12; i++) {
+                const span = document.querySelector('.calc-' + row.id + '-' + i);
+                if (!span) continue;
+                const v = row.calc(i, getCell);
+                span.textContent = fmtBy(row.format, v);
+                span.classList.toggle('pos', v!==null && v>0 && row.id.startsWith('db_'));
+                span.classList.toggle('neg', v!==null && v<0);
+            }
+        }
+        const totalSpan = document.querySelector('.calc-total-' + row.id);
+        if (!totalSpan) return;
+        let v = null;
+        if (row.total === 'sum') v = aggHelpers.sum(row.id);
+        else if (row.total === 'avgNonZero') v = aggHelpers.avgNonZero(row.id);
+        else if (row.total === 'calc' && row.totalCalc) v = row.totalCalc(aggHelpers);
+        totalSpan.textContent = fmtBy(row.format, v);
+        if (row.id.startsWith('db_') && v !== null) {
+            totalSpan.classList.toggle('pos', v > 0);
+            totalSpan.classList.toggle('neg', v < 0);
+        }
+    });
+    renderKpis();
+}
+function renderKpis() {
+    const grid = document.getElementById('kpiGrid');
+    const umsatz = aggHelpers.sum('umsatz_netto');
+    const ebit = aggHelpers.sum('ebit');
+    const wareneinsatz = aggHelpers.sum('wareneinsatz');
+    const rohertrag = umsatz - wareneinsatz;
+    const aktive = aggHelpers.avgNonZero('aktive_kaeufer');
+    const bestellungen = aggHelpers.sum('bestellungen_gesamt');
+    const ebitMarge = umsatz ? ebit / umsatz : null;
+    grid.innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Umsatz Netto</div><div class="kpi-value">${fmtEUR(umsatz)}</div><div class="kpi-sub">${state.activeYear} · 12 Monate</div></div>
+        <div class="kpi-card"><div class="kpi-label">Rohertrag</div><div class="kpi-value">${fmtEUR(rohertrag)}</div><div class="kpi-sub">Marge: ${umsatz ? fmtPCT(rohertrag/umsatz) : '–'}</div></div>
+        <div class="kpi-card accent"><div class="kpi-label">EBIT</div><div class="kpi-value">${fmtEUR(ebit)}</div><div class="kpi-sub">EBIT-Marge: ${ebitMarge!==null ? fmtPCT(ebitMarge) : '–'}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Bestellungen</div><div class="kpi-value">${fmtNUM(bestellungen)}</div><div class="kpi-sub">Ø aktive Käufer/Monat: ${fmtNUM(aktive)}</div></div>
+    `;
+}
+
+/* =================================================================
+   PANEL: Dashboard
+   ================================================================= */
+function renderDashboard() {
+    const yr = state.dashboard.year;
+    const m = state.dashboard.month;
+    const agg = aggFor(yr);
+    const get = (id, mi) => getCellY(yr, id, mi);
+
+    const rows = [
+        ['Umsatz Netto',      get('umsatz_netto', m), agg.sum('umsatz_netto'),     'EUR',     'Monatswert | Jahressumme'],
+        ['Rohertrag',         (get('umsatz_netto', m) ?? 0) - (get('wareneinsatz', m) ?? 0), agg.sum('umsatz_netto') - agg.sum('wareneinsatz'), 'EUR', 'Monatswert | Jahressumme'],
+        ['EBIT',              get('ebit', m), agg.sum('ebit'),                     'EUR',     'Monatswert | Jahressumme'],
+        ['EBIT-Marge',        (() => { const u = get('umsatz_netto', m); return u ? get('ebit', m)/u : null; })(),
+                              (() => { const u = agg.sum('umsatz_netto'); return u ? agg.sum('ebit')/u : null; })(), '%', 'Monatswert | Jahresø'],
+        ['Aktive Käufer',     get('aktive_kaeufer', m), agg.avgNonZero('aktive_kaeufer'), 'Anzahl', 'Monatswert | Jahresø'],
+        ['EBIT pro Kunde',    (() => { const k = get('aktive_kaeufer', m); return k ? get('ebit', m)/k : null; })(),
+                              (() => { const k = agg.avgNonZero('aktive_kaeufer'); return k ? agg.sum('ebit')/12/k : null; })(), 'EUR', 'Monatswert | Jahresø'],
+        ['Bestellungen gesamt', get('bestellungen_gesamt', m), agg.sum('bestellungen_gesamt'), 'Anzahl', 'Monatswert | Jahressumme'],
+        ['AOV',               get('aov', m), agg.avgNonZero('aov'),                'EUR',     'Monatswert | Jahresø'],
+        ['CRR',               get('crr', m), agg.avgNonZero('crr'),                '%',       'Monatswert | Jahresø'],
+        ['CLV',               get('clv', m), agg.avgNonZero('clv'),                'EUR',     'Monatswert | Jahresø'],
+        ['NK-Quote',          (() => { const b = get('bestellungen_gesamt', m); return b ? (get('orders_nk', m) ?? 0)/b : null; })(),
+                              (() => { const b = agg.sum('bestellungen_gesamt'); return b ? agg.sum('orders_nk')/b : null; })(), '%', 'Monatswert | Jahresø'],
+        ['Traffic gesamt',    get('traffic_total', m), agg.sum('traffic_total'),   'Sessions','Monatswert | Jahressumme'],
+        ['Conversion Rate',   get('cr', m), agg.avgNonZero('cr'),                  '%',       'Monatswert | Jahresø'],
+    ];
+    const fmt = (v, unit) => unit === '%' ? fmtPCT(v) : unit === 'EUR' ? fmtEUR(v) : fmtNUM(v);
+    const tb = document.getElementById('tbodyDashboard');
+    tb.innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${fmt(r[1], r[3])}</td><td>${fmt(r[2], r[3])}</td><td>${r[3]}</td><td style="color:var(--text-muted)">${r[4]}</td></tr>`).join('');
+}
+
+/* =================================================================
+   PANEL: Kanal-Analyse
+   ================================================================= */
+function getKanalExtra(year) {
+    if (!state.kanal.extra[year]) state.kanal.extra[year] = {};
+    return state.kanal.extra[year];
+}
+function renderKanal() {
+    const yr = state.kanal.year;
+    const agg = aggFor(yr);
+    // Rentabilität table
+    const rows = [];
+    let totalUmsatz = 0, totalWK = 0;
+    CHANNELS.forEach(c => {
+        const u = agg.sum('umsatz_'+c.key);
+        const w = agg.sum('wk_'+c.key);
+        totalUmsatz += u; totalWK += w;
+        rows.push({ name: c.label, umsatz: u, wk: w, source: 'auto' });
+    });
+    const extra = getKanalExtra(yr);
+    EXTRA_CHANNELS.forEach(name => {
+        const e = extra[name] || { umsatz: '', wk: '' };
+        const u = Number(e.umsatz) || 0;
+        const w = Number(e.wk) || 0;
+        totalUmsatz += u; totalWK += w;
+        rows.push({ name, umsatz: u, wk: w, source: 'manual', stored: e });
+    });
+
+    const tb = document.getElementById('tbodyKanalRent');
+    tb.innerHTML = '';
+    rows.forEach(r => {
+        const tr = document.createElement('tr');
+        const roas = r.wk ? r.umsatz / r.wk : null;
+        const db = r.umsatz - r.wk;
+        const dbm = r.umsatz ? db / r.umsatz : null;
+        const share = totalUmsatz ? r.umsatz / totalUmsatz : null;
+
+        const tdName = document.createElement('td');
+        tdName.textContent = r.name;
+        tr.appendChild(tdName);
+
+        if (r.source === 'auto') {
+            tr.appendChild(td(fmtEUR(r.umsatz)));
+            tr.appendChild(td(fmtEUR(r.wk)));
+        } else {
+            const tdU = document.createElement('td');
+            const inpU = document.createElement('input');
+            inpU.type = 'number'; inpU.step = 'any';
+            inpU.className = 'cell-input input-yellow';
+            inpU.value = r.stored.umsatz || ''; inpU.placeholder = '€';
+            inpU.addEventListener('input', () => {
+                if (!extra[r.name]) extra[r.name] = {};
+                extra[r.name].umsatz = inpU.value;
+                saveState(); renderKanal();
+            });
+            tdU.appendChild(inpU); tr.appendChild(tdU);
+
+            const tdW = document.createElement('td');
+            const inpW = document.createElement('input');
+            inpW.type = 'number'; inpW.step = 'any';
+            inpW.className = 'cell-input input-yellow';
+            inpW.value = r.stored.wk || ''; inpW.placeholder = '€';
+            inpW.addEventListener('input', () => {
+                if (!extra[r.name]) extra[r.name] = {};
+                extra[r.name].wk = inpW.value;
+                saveState(); renderKanal();
+            });
+            tdW.appendChild(inpW); tr.appendChild(tdW);
+        }
+        tr.appendChild(td(roas === null ? '–' : fmtNUM2(roas) + 'x'));
+        tr.appendChild(td(fmtEUR(db), db >= 0 ? 'pos' : 'neg'));
+        tr.appendChild(td(fmtPCT(dbm)));
+        tr.appendChild(td(fmtPCT(share)));
+        tb.appendChild(tr);
+    });
+    // Total row
+    const totalDB = totalUmsatz - totalWK;
+    const totalDBM = totalUmsatz ? totalDB / totalUmsatz : null;
+    const totalROAS = totalWK ? totalUmsatz / totalWK : null;
+    const trT = document.createElement('tr');
+    trT.className = 'total-row';
+    trT.innerHTML = `<td>GESAMT</td><td>${fmtEUR(totalUmsatz)}</td><td>${fmtEUR(totalWK)}</td><td>${totalROAS===null?'–':fmtNUM2(totalROAS)+'x'}</td><td>${fmtEUR(totalDB)}</td><td>${fmtPCT(totalDBM)}</td><td>100%</td>`;
+    tb.appendChild(trT);
+
+    // Detail per channel monthly
+    renderKanalDetail();
+}
+function td(text, cls) {
+    const t = document.createElement('td');
+    t.textContent = text;
+    if (cls) t.classList.add(cls === 'pos' ? 'val-pos' : cls === 'neg' ? 'val-neg' : cls);
+    return t;
+}
+function renderKanalDetail() {
+    const yr = state.kanal.year;
+    const get = (id, mi) => getCellY(yr, id, mi);
+    const agg = aggFor(yr);
+
+    const thead = document.getElementById('theadKanalDetail');
+    thead.innerHTML = '';
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'Kanal / Metrik'}));
+    MONTHS.forEach(m => thead.appendChild(Object.assign(document.createElement('th'),{textContent:m})));
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'Gesamt'}));
+
+    const tb = document.getElementById('tbodyKanalDetail');
+    tb.innerHTML = '';
+    CHANNELS.forEach(c => {
+        // Header
+        const trH = document.createElement('tr');
+        trH.className = 'row-subsection';
+        const tdH = document.createElement('td'); tdH.colSpan = 14; tdH.textContent = '🔹 ' + c.label;
+        trH.appendChild(tdH); tb.appendChild(trH);
+
+        // Traffic, Umsatz, WK, CR, DB
+        const lines = [
+            { lbl: 'Traffic (Sessions)', f: 'num', vals: i => get('traffic_'+c.key, i), tot: agg.sum('traffic_'+c.key) },
+            { lbl: 'Umsatz (€)',         f: 'eur', vals: i => get('umsatz_'+c.key, i),  tot: agg.sum('umsatz_'+c.key) },
+            { lbl: 'Werbekosten (€)',    f: 'eur', vals: i => get('wk_'+c.key, i),      tot: agg.sum('wk_'+c.key) },
+            { lbl: 'Kanal-CR (%)',       f: 'pct',
+              vals: i => { const t = get('traffic_'+c.key, i); return t ? (get('umsatz_'+c.key, i) ?? 0) / 0 : null; }, // not really CR, but channel_umsatz/traffic
+              tot: null,
+              vfn: i => { const t = get('traffic_'+c.key, i); const u = get('umsatz_'+c.key, i) || 0; return t ? u / t : null; },
+              totFn: () => { const t = agg.sum('traffic_'+c.key); const u = agg.sum('umsatz_'+c.key); return t ? u/t : null; } },
+            { lbl: 'Deckungsbeitrag (€)', f: 'eur',
+              vfn: i => (get('umsatz_'+c.key, i) ?? 0) - (get('wk_'+c.key, i) ?? 0),
+              totFn: () => agg.sum('umsatz_'+c.key) - agg.sum('wk_'+c.key) }
+        ];
+        lines.forEach(line => {
+            const tr = document.createElement('tr');
+            tr.appendChild(Object.assign(document.createElement('td'),{textContent: line.lbl}));
+            for (let i=0; i<12; i++) {
+                const v = line.vfn ? line.vfn(i) : line.vals(i);
+                tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtBy(line.f, v)}));
+            }
+            const totV = line.totFn ? line.totFn() : line.tot;
+            tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtBy(line.f, totV)}));
+            tb.appendChild(tr);
+        });
+    });
+}
+
+/* =================================================================
+   PANEL: Jahresvergleich
+   ================================================================= */
+const COMPARE_ROWS = [
+    { id: 'umsatz_netto',    label: 'Umsatz Netto (€)',          format: 'eur', from: 'sum' },
+    { id: 'wareneinsatz',    label: 'Wareneinsatz (€)',          format: 'eur', from: 'sum' },
+    { id: 'rohertrag',       label: 'Rohertrag (€)',             format: 'eur', from: 'derived',
+      derive: agg => agg.sum('umsatz_netto') - agg.sum('wareneinsatz') },
+    { id: 'ebit',            label: 'EBIT (€)',                  format: 'eur', from: 'sum' },
+    { id: 'ebit_marge',      label: 'EBIT-Marge (%)',            format: 'pct', from: 'derived',
+      derive: agg => { const u = agg.sum('umsatz_netto'); return u ? agg.sum('ebit')/u : null; } },
+    { id: 'aktive_kaeufer',  label: 'Aktive Käufer (Ø)',         format: 'num', from: 'avgNonZero' },
+    { id: 'bestellungen_gesamt', label: 'Bestellungen',          format: 'num', from: 'sum' },
+    { id: 'aov',             label: 'AOV (€)',                   format: 'eur', from: 'avgNonZero' },
+    { id: 'crr',             label: 'CRR (%)',                   format: 'pct', from: 'avgNonZero' },
+    { id: 'clv',             label: 'CLV (€)',                   format: 'eur', from: 'avgNonZero' },
+    { id: 'nk_quote',        label: 'NK-Quote (%)',              format: 'pct', from: 'derived',
+      derive: agg => { const b = agg.sum('bestellungen_gesamt'); return b ? agg.sum('orders_nk')/b : null; } },
+    { id: 'traffic_total',   label: 'Traffic gesamt',            format: 'num', from: 'sum' },
+    { id: 'cr',              label: 'Conversion Rate (%)',       format: 'pct', from: 'avgNonZero' },
+];
+function getJahrValue(row, year) {
+    if (year === 2025 || year === 2026) {
+        const agg = aggFor(String(year));
+        if (row.from === 'sum') return agg.sum(row.id);
+        if (row.from === 'avgNonZero') return agg.avgNonZero(row.id);
+        if (row.from === 'derived') return row.derive(agg);
+    } else {
+        const v = state.jahre[year]?.[row.id];
+        return (v === undefined || v === null || v === '') ? null : Number(v);
+    }
+    return null;
+}
+function renderJahresvergleich() {
+    const thead = document.getElementById('theadJahresvergleich');
+    thead.innerHTML = '';
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'KPI'}));
+    COMPARE_YEARS.forEach(y => {
+        const th = document.createElement('th');
+        th.textContent = y;
+        if (y === 2025 || y === 2026) th.style.color = 'var(--gold-bright)';
+        thead.appendChild(th);
+    });
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'YoY %'}));
+
+    const tb = document.getElementById('tbodyJahresvergleich');
+    tb.innerHTML = '';
+    COMPARE_ROWS.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: row.label}));
+        const values = COMPARE_YEARS.map(y => getJahrValue(row, y));
+        COMPARE_YEARS.forEach((y, idx) => {
+            const td = document.createElement('td');
+            const isAuto = (y === 2025 || y === 2026);
+            if (isAuto) {
+                const span = document.createElement('span');
+                span.className = 'calc-cell';
+                span.textContent = fmtBy(row.format, values[idx]);
+                td.appendChild(span);
+            } else {
+                const inp = document.createElement('input');
+                inp.type = 'number'; inp.step = row.format === 'pct' ? '0.01' : 'any';
+                inp.className = 'cell-input input-yellow';
+                const stored = state.jahre[y]?.[row.id];
+                if (stored !== undefined && stored !== null) inp.value = row.format === 'pct' ? (Number(stored) * 100) : stored;
+                inp.placeholder = row.format === 'eur' ? '€' : row.format === 'pct' ? '%' : '–';
+                inp.addEventListener('input', () => {
+                    if (!state.jahre[y]) state.jahre[y] = {};
+                    let v = inp.value;
+                    if (v === '' || v === null) delete state.jahre[y][row.id];
+                    else { let n = Number(v); if (row.format === 'pct') n = n/100; state.jahre[y][row.id] = n; }
+                    saveState(); renderJahresvergleich();
+                });
+                td.appendChild(inp);
+            }
+            tr.appendChild(td);
+        });
+        // YoY
+        const last = values[values.length-1] ?? values.findLast?.(v => v !== null) ?? null;
+        // Find latest two non-null years
+        let yoy = null, current = null, prev = null;
+        for (let i = values.length-1; i >= 0; i--) {
+            if (values[i] !== null && current === null) current = values[i];
+            else if (values[i] !== null && prev === null) { prev = values[i]; break; }
+        }
+        if (current !== null && prev !== null && prev !== 0) yoy = (current - prev) / Math.abs(prev);
+        const tdYoY = document.createElement('td');
+        tdYoY.textContent = yoy === null ? '–' : fmtPCT(yoy);
+        if (yoy !== null) tdYoY.style.color = yoy >= 0 ? 'var(--green)' : 'var(--red)';
+        tr.appendChild(tdYoY);
+        tb.appendChild(tr);
+    });
+}
+
+/* =================================================================
+   PANEL: Produktgruppen
+   ================================================================= */
+function renderProduktgruppen() {
+    if (!state.produkt.totals) state.produkt.totals = {};
+    if (!state.produkt.monthly) state.produkt.monthly = {};
+
+    const tb = document.getElementById('tbodyProduktgruppen');
+    tb.innerHTML = '';
+    let totalU = 0, totalW = 0;
+    state.produkt.groups.forEach((g, idx) => {
+        const t = state.produkt.totals[idx] || { umsatz: '', wk: '' };
+        const u = Number(t.umsatz) || 0;
+        const w = Number(t.wk) || 0;
+        totalU += u; totalW += w;
+    });
+
+    state.produkt.groups.forEach((groupName, idx) => {
+        const t = state.produkt.totals[idx] || { umsatz: '', wk: '' };
+        const u = Number(t.umsatz) || 0;
+        const w = Number(t.wk) || 0;
+        const share = totalU ? u / totalU : null;
+        const db = u - w;
+        const dbm = u ? db / u : null;
+
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        const inpName = document.createElement('input');
+        inpName.type = 'text'; inpName.className = 'cell-input input-yellow text';
+        inpName.value = groupName;
+        inpName.addEventListener('input', () => {
+            state.produkt.groups[idx] = inpName.value; saveState();
+        });
+        tdName.appendChild(inpName); tr.appendChild(tdName);
+
+        const tdU = document.createElement('td');
+        const inpU = document.createElement('input');
+        inpU.type = 'number'; inpU.step = 'any'; inpU.className = 'cell-input input-yellow';
+        inpU.value = t.umsatz || ''; inpU.placeholder = '€';
+        inpU.addEventListener('input', () => {
+            if (!state.produkt.totals[idx]) state.produkt.totals[idx] = {};
+            state.produkt.totals[idx].umsatz = inpU.value;
+            saveState(); renderProduktgruppen();
+        });
+        tdU.appendChild(inpU); tr.appendChild(tdU);
+
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtPCT(share)}));
+
+        const tdW = document.createElement('td');
+        const inpW = document.createElement('input');
+        inpW.type = 'number'; inpW.step = 'any'; inpW.className = 'cell-input input-yellow';
+        inpW.value = t.wk || ''; inpW.placeholder = '€';
+        inpW.addEventListener('input', () => {
+            if (!state.produkt.totals[idx]) state.produkt.totals[idx] = {};
+            state.produkt.totals[idx].wk = inpW.value;
+            saveState(); renderProduktgruppen();
+        });
+        tdW.appendChild(inpW); tr.appendChild(tdW);
+
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtEUR(db)}));
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtPCT(dbm)}));
+        tb.appendChild(tr);
+    });
+    const trT = document.createElement('tr'); trT.className = 'total-row';
+    const totDB = totalU - totalW;
+    const totDBM = totalU ? totDB / totalU : null;
+    trT.innerHTML = `<td>GESAMT</td><td>${fmtEUR(totalU)}</td><td>100%</td><td>${fmtEUR(totalW)}</td><td>${fmtEUR(totDB)}</td><td>${fmtPCT(totDBM)}</td>`;
+    tb.appendChild(trT);
+
+    // Monthly per group
+    const thead = document.getElementById('theadProduktMonate');
+    thead.innerHTML = '';
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'Monat'}));
+    state.produkt.groups.forEach(g => thead.appendChild(Object.assign(document.createElement('th'),{textContent:g})));
+    thead.appendChild(Object.assign(document.createElement('th'),{textContent:'Σ Monat'}));
+
+    const tbm = document.getElementById('tbodyProduktMonate');
+    tbm.innerHTML = '';
+    MONTHS.forEach((m, mi) => {
+        const tr = document.createElement('tr');
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: m}));
+        let sum = 0;
+        state.produkt.groups.forEach((g, gi) => {
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'number'; inp.step = 'any'; inp.className = 'cell-input input-yellow';
+            const stored = state.produkt.monthly[mi]?.[gi];
+            if (stored !== undefined && stored !== null) inp.value = stored;
+            inp.placeholder = '€';
+            inp.addEventListener('input', () => {
+                if (!state.produkt.monthly[mi]) state.produkt.monthly[mi] = {};
+                if (inp.value === '') delete state.produkt.monthly[mi][gi];
+                else state.produkt.monthly[mi][gi] = inp.value;
+                saveState(); renderProduktgruppen();
+            });
+            td.appendChild(inp); tr.appendChild(td);
+            sum += Number(stored) || 0;
+        });
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtEUR(sum)}));
+        tbm.appendChild(tr);
+    });
+}
+
+/* =================================================================
+   PANEL: NK vs. BK
+   ================================================================= */
+function renderNKBK() {
+    const yr = state.nkbk.year;
+    if (!state.nkbk.monthly[yr]) state.nkbk.monthly[yr] = {};
+    const monthly = state.nkbk.monthly[yr];
+    const agg = aggFor(yr);
+
+    // Total
+    let nkU = 0, bkU = 0, nkW = 0, bkW = 0;
+    for (let i=0; i<12; i++) {
+        const m = monthly[i] || {};
+        nkU += Number(m.nk_umsatz) || 0;
+        bkU += Number(m.bk_umsatz) || 0;
+        nkW += Number(m.nk_wk) || 0;
+        bkW += Number(m.bk_wk) || 0;
+    }
+    const total = nkU + bkU;
+    const nkOrd = agg.sum('orders_nk');
+    const bkOrd = agg.sum('orders_bk');
+    const nkAOV = nkOrd ? nkU / nkOrd : null;
+    const bkAOV = bkOrd ? bkU / bkOrd : null;
+    const nkDB = nkU - nkW;
+    const bkDB = bkU - bkW;
+    const nkDBM = nkU ? nkDB/nkU : null;
+    const bkDBM = bkU ? bkDB/bkU : null;
+
+    const tb = document.getElementById('tbodyNKBKtotal');
+    tb.innerHTML = `
+        <tr><td>Neukunden</td><td>${fmtEUR(nkU)}</td><td>${fmtPCT(total ? nkU/total : null)}</td><td>${fmtEUR(nkW)}</td><td>${fmtEUR(nkDB)}</td><td>${fmtPCT(nkDBM)}</td><td>${fmtNUM(nkOrd)}</td><td>${fmtEUR(nkAOV)}</td></tr>
+        <tr><td>Bestandskunden</td><td>${fmtEUR(bkU)}</td><td>${fmtPCT(total ? bkU/total : null)}</td><td>${fmtEUR(bkW)}</td><td>${fmtEUR(bkDB)}</td><td>${fmtPCT(bkDBM)}</td><td>${fmtNUM(bkOrd)}</td><td>${fmtEUR(bkAOV)}</td></tr>
+        <tr class="total-row"><td>GESAMT</td><td>${fmtEUR(total)}</td><td>100%</td><td>${fmtEUR(nkW+bkW)}</td><td>${fmtEUR(nkDB+bkDB)}</td><td>${fmtPCT(total ? (nkDB+bkDB)/total : null)}</td><td>${fmtNUM(nkOrd+bkOrd)}</td><td>–</td></tr>
+    `;
+
+    // Monthly
+    const tbm = document.getElementById('tbodyNKBKmonate');
+    tbm.innerHTML = '';
+    MONTHS.forEach((mLabel, i) => {
+        const m = monthly[i] || {};
+        const nu = Number(m.nk_umsatz) || 0;
+        const bu = Number(m.bk_umsatz) || 0;
+        const tr = document.createElement('tr');
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: mLabel}));
+        ['nk_umsatz','bk_umsatz'].forEach(field => {
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'number'; inp.step = 'any'; inp.className = 'cell-input input-yellow';
+            inp.value = m[field] ?? ''; inp.placeholder = '€';
+            inp.addEventListener('input', () => {
+                if (!monthly[i]) monthly[i] = {};
+                if (inp.value === '') delete monthly[i][field];
+                else monthly[i][field] = inp.value;
+                saveState(); renderNKBK();
+            });
+            td.appendChild(inp); tr.appendChild(td);
+        });
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: nu+bu ? fmtPCT(nu/(nu+bu)) : '–'}));
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: nu+bu ? fmtPCT(bu/(nu+bu)) : '–'}));
+        ['nk_wk','bk_wk'].forEach(field => {
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'number'; inp.step = 'any'; inp.className = 'cell-input input-yellow';
+            inp.value = m[field] ?? ''; inp.placeholder = '€';
+            inp.addEventListener('input', () => {
+                if (!monthly[i]) monthly[i] = {};
+                if (inp.value === '') delete monthly[i][field];
+                else monthly[i][field] = inp.value;
+                saveState(); renderNKBK();
+            });
+            td.appendChild(inp); tr.appendChild(td);
+        });
+        tbm.appendChild(tr);
+    });
+}
+
+/* =================================================================
+   PANEL: Kohorten
+   ================================================================= */
+function renderKohorten() {
+    const tb = document.getElementById('tbodyKohorten');
+    tb.innerHTML = '';
+    state.kohorten.forEach((row, idx) => {
+        const k = Number(row.kunden) || 0;
+        const u = Number(row.umsatz) || 0;
+        const w = Number(row.wk) || 0;
+        const wkr = row.wkr === '' || row.wkr === null || row.wkr === undefined ? null : Number(row.wkr);
+        const upk = k ? u/k : null;
+        const db = u - w;
+        const dbpk = k ? db/k : null;
+
+        const tr = document.createElement('tr');
+        // Kohorte (text)
+        const td0 = document.createElement('td');
+        const inp0 = document.createElement('input');
+        inp0.type = 'text'; inp0.className = 'cell-input input-yellow text';
+        inp0.value = row.kohorte || ''; inp0.placeholder = 'z.B. 01/2025';
+        inp0.addEventListener('input', () => { row.kohorte = inp0.value; saveState(); });
+        td0.appendChild(inp0); tr.appendChild(td0);
+
+        ['kunden','umsatz'].forEach(field => {
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'number'; inp.step = 'any'; inp.className = 'cell-input input-yellow';
+            inp.value = row[field] || ''; inp.placeholder = field === 'kunden' ? '#' : '€';
+            inp.addEventListener('input', () => { row[field] = inp.value; saveState(); renderKohorten(); });
+            td.appendChild(inp); tr.appendChild(td);
+        });
+
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtEUR(upk)}));
+
+        const tdW = document.createElement('td');
+        const inpW = document.createElement('input');
+        inpW.type = 'number'; inpW.step = 'any'; inpW.className = 'cell-input input-yellow';
+        inpW.value = row.wk || ''; inpW.placeholder = '€';
+        inpW.addEventListener('input', () => { row.wk = inpW.value; saveState(); renderKohorten(); });
+        tdW.appendChild(inpW); tr.appendChild(tdW);
+
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtEUR(db)}));
+        tr.appendChild(Object.assign(document.createElement('td'),{textContent: fmtEUR(dbpk)}));
+
+        const tdR = document.createElement('td');
+        const inpR = document.createElement('input');
+        inpR.type = 'number'; inpR.step = '0.01'; inpR.className = 'cell-input input-yellow';
+        inpR.value = wkr === null ? '' : wkr * 100;
+        inpR.placeholder = '%';
+        inpR.addEventListener('input', () => {
+            if (inpR.value === '') row.wkr = '';
+            else row.wkr = Number(inpR.value) / 100;
+            saveState();
+        });
+        tdR.appendChild(inpR); tr.appendChild(tdR);
+
+        tb.appendChild(tr);
+    });
+}
+
+document.getElementById('btnAddKohorte').addEventListener('click', () => {
+    state.kohorten.push({ id: Date.now(), kohorte: '', kunden: '', umsatz: '', wk: '', wkr: '' });
+    saveState(); renderKohorten();
+});
+
+/* =================================================================
+   PANEL: Einschätzung
+   ================================================================= */
+function bindEinschaetzung() {
+    Object.keys(state.einschaetzung).forEach(k => {
+        const el = document.getElementById('ein_' + k);
+        if (!el) return;
+        el.value = state.einschaetzung[k] || '';
+        el.addEventListener('input', () => {
+            state.einschaetzung[k] = el.value;
+            saveState();
+        });
+    });
+}
+
+/* =================================================================
+   YEAR / MONTH SWITCHES
+   ================================================================= */
+document.querySelectorAll('.tab-switch .tab-btn[data-year]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-switch .tab-btn[data-year]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.activeYear = btn.dataset.year;
+        saveState();
+        refreshAgg();
+        renderMonatsdatenBody();
+        recomputeMonatsdaten();
+        refreshScrollIndicators();
+    });
+});
+
+document.getElementById('dashYear').addEventListener('change', e => {
+    state.dashboard.year = e.target.value; saveState(); renderDashboard();
+});
+document.getElementById('dashMonth').addEventListener('change', e => {
+    state.dashboard.month = parseInt(e.target.value, 10); saveState(); renderDashboard();
+});
+function fillMonthSelect() {
+    const sel = document.getElementById('dashMonth');
+    sel.innerHTML = MONTHS.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+    sel.value = state.dashboard.month;
+    document.getElementById('dashYear').value = state.dashboard.year;
+}
+
+document.getElementById('kanalYear').addEventListener('change', e => {
+    state.kanal.year = e.target.value; saveState(); renderKanal();
+});
+document.getElementById('kanalYear').value = state.kanal.year;
+
+document.getElementById('nkbkYear').addEventListener('change', e => {
+    state.nkbk.year = e.target.value; saveState(); renderNKBK();
+});
+document.getElementById('nkbkYear').value = state.nkbk.year;
+
+/* ── Customer ──────────── */
+const inpShop = document.getElementById('inpShop');
+const inpCustomer = document.getElementById('inpCustomer');
+inpShop.value = state.customer.shop || '';
+inpCustomer.value = state.customer.name || '';
+inpShop.addEventListener('input', e => { state.customer.shop = e.target.value; saveState(); });
+inpCustomer.addEventListener('input', e => { state.customer.name = e.target.value; saveState(); });
+
+/* ── Reset ──────────── */
+function doReset() {
+    if (!confirm('Wirklich ALLE Eingaben (Monatsdaten, Kanäle, Produktgruppen, Kohorten, Einschätzung etc.) zurücksetzen?')) return;
+    Object.assign(state, defaultState());
+    saveState();
+    location.reload();
+}
+document.getElementById('btnReset').addEventListener('click', doReset);
+document.getElementById('btnReset2').addEventListener('click', doReset);
+
+/* ── Main tab nav ──────────── */
+document.querySelectorAll('.main-tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.main-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.panel;
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + target).classList.add('active');
+        // re-render the panel to ensure fresh data
+        if (target === 'dashboard') renderDashboard();
+        else if (target === 'kanal') renderKanal();
+        else if (target === 'jahresvergleich') renderJahresvergleich();
+        else if (target === 'produktgruppen') renderProduktgruppen();
+        else if (target === 'nkbk') renderNKBK();
+        else if (target === 'kohorten') renderKohorten();
+        setTimeout(refreshScrollIndicators, 50);
+    });
+});
+
+/* =================================================================
+   EXPORT: EXCEL
+   ================================================================= */
+document.getElementById('btnExportXlsx').addEventListener('click', exportXlsx);
+document.getElementById('btnExportXlsx2').addEventListener('click', exportXlsx);
+
+function exportXlsx() {
+    const wb = XLSX.utils.book_new();
+
+    // Cover
+    const cover = [
+        ['North Star Metrics – Kunden-Tracking'],
+        [],
+        ['Shop-Domain', state.customer.shop || ''],
+        ['Kundenname', state.customer.name || ''],
+        ['Erstellt', new Date().toLocaleDateString('de-DE')],
+        []
+    ];
+    const wsC = XLSX.utils.aoa_to_sheet(cover);
+    wsC['!cols'] = [{wch: 30}, {wch: 40}];
+    XLSX.utils.book_append_sheet(wb, wsC, 'Übersicht');
+
+    // Monatsdaten 2025 + 2026
+    ['2025','2026'].forEach(year => {
+        const rows = [['KPI', ...MONTHS, 'Gesamt / Ø']];
+        const agg = aggFor(year);
+        ROWS.forEach(row => {
+            if (row.type === 'section' || row.type === 'subsection') { rows.push([row.label]); return; }
+            const line = [row.label];
+            for (let i=0; i<12; i++) {
+                const v = (row.type === 'calc') ? row.calc(i, (id, mi) => getCellY(year, id, mi)) : getCellY(year, row.id, i);
+                line.push((v === null || v === undefined || isNaN(v)) ? '' : v);
+            }
+            let v = null;
+            if (row.total === 'sum') v = agg.sum(row.id);
+            else if (row.total === 'avgNonZero') v = agg.avgNonZero(row.id);
+            else if (row.total === 'calc' && row.totalCalc) v = row.totalCalc(agg);
+            line.push(v === null || isNaN(v) ? '' : v);
+            rows.push(line);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{wch: 38}, ...Array(12).fill({wch: 12}), {wch: 14}];
+        XLSX.utils.book_append_sheet(wb, ws, `Monatsdaten ${year}`);
+    });
+
+    // Dashboard (current selection)
+    {
+        const yr = state.dashboard.year;
+        const m = state.dashboard.month;
+        const agg = aggFor(yr);
+        const get = (id, mi) => getCellY(yr, id, mi);
+        const data = [
+            ['Geschäftsjahr', yr],
+            ['Monat', MONTHS[m]],
+            [],
+            ['KPI','Monatswert','Jahres-Summe / Ø','Einheit'],
+            ['Umsatz Netto', get('umsatz_netto', m) || '', agg.sum('umsatz_netto'), 'EUR'],
+            ['Rohertrag', (get('umsatz_netto', m) || 0) - (get('wareneinsatz', m) || 0), agg.sum('umsatz_netto') - agg.sum('wareneinsatz'), 'EUR'],
+            ['EBIT', get('ebit', m) || '', agg.sum('ebit'), 'EUR'],
+            ['Aktive Käufer', get('aktive_kaeufer', m) || '', agg.avgNonZero('aktive_kaeufer'), 'Anzahl'],
+            ['Bestellungen', get('bestellungen_gesamt', m) || '', agg.sum('bestellungen_gesamt'), 'Anzahl'],
+            ['AOV', get('aov', m) || '', agg.avgNonZero('aov'), 'EUR'],
+            ['CRR', get('crr', m) || '', agg.avgNonZero('crr'), '%'],
+            ['CLV', get('clv', m) || '', agg.avgNonZero('clv'), 'EUR'],
+            ['Traffic', get('traffic_total', m) || '', agg.sum('traffic_total'), 'Sessions'],
+            ['CR', get('cr', m) || '', agg.avgNonZero('cr'), '%']
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        ws['!cols'] = [{wch: 30},{wch: 16},{wch: 18},{wch: 12}];
+        XLSX.utils.book_append_sheet(wb, ws, 'Dashboard');
+    }
+
+    // Kanal-Rentabilität
+    {
+        const yr = state.kanal.year;
+        const agg = aggFor(yr);
+        const data = [['Werbekanal','Umsatz','Werbekosten','ROAS','DB','DB-Marge','Anteil']];
+        let totU = 0, totW = 0;
+        const rows = CHANNELS.map(c => ({ name: c.label, u: agg.sum('umsatz_'+c.key), w: agg.sum('wk_'+c.key) }));
+        const extra = getKanalExtra(yr);
+        EXTRA_CHANNELS.forEach(name => {
+            const e = extra[name] || {};
+            rows.push({ name, u: Number(e.umsatz)||0, w: Number(e.wk)||0 });
+        });
+        rows.forEach(r => totU += r.u);
+        rows.forEach(r => totW += r.w);
+        rows.forEach(r => {
+            const roas = r.w ? r.u/r.w : null;
+            const db = r.u - r.w;
+            data.push([r.name, r.u, r.w, roas, db, r.u ? db/r.u : null, totU ? r.u/totU : null]);
+        });
+        data.push(['GESAMT', totU, totW, totW ? totU/totW : null, totU - totW, totU ? (totU-totW)/totU : null, 1]);
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        ws['!cols'] = [{wch: 24},{wch: 14},{wch: 14},{wch: 8},{wch: 14},{wch: 12},{wch: 10}];
+        XLSX.utils.book_append_sheet(wb, ws, `Kanal-Rentabilität ${yr}`);
+    }
+
+    // Jahresvergleich
+    {
+        const data = [['KPI', ...COMPARE_YEARS]];
+        COMPARE_ROWS.forEach(row => {
+            const line = [row.label];
+            COMPARE_YEARS.forEach(y => {
+                const v = getJahrValue(row, y);
+                line.push(v === null ? '' : v);
+            });
+            data.push(line);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        ws['!cols'] = [{wch: 28}, ...COMPARE_YEARS.map(()=>({wch: 14}))];
+        XLSX.utils.book_append_sheet(wb, ws, 'Jahresvergleich');
+    }
+
+    // Produktgruppen
+    {
+        const data = [['Produktgruppe','Umsatz','Anteil','Werbekosten','DB','DB-Marge']];
+        let tu = 0, tw = 0;
+        state.produkt.groups.forEach((g,i) => {
+            const t = state.produkt.totals[i] || {};
+            tu += Number(t.umsatz)||0; tw += Number(t.wk)||0;
+        });
+        state.produkt.groups.forEach((g,i) => {
+            const t = state.produkt.totals[i] || {};
+            const u = Number(t.umsatz)||0; const w = Number(t.wk)||0;
+            data.push([g, u, tu ? u/tu : '', w, u-w, u ? (u-w)/u : '']);
+        });
+        data.push(['GESAMT', tu, 1, tw, tu-tw, tu ? (tu-tw)/tu : '']);
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, 'Produktgruppen');
+    }
+
+    // NK vs BK
+    {
+        const yr = state.nkbk.year;
+        const monthly = state.nkbk.monthly[yr] || {};
+        const agg = aggFor(yr);
+        const data = [['Monat','NK Umsatz','BK Umsatz','NK Anteil','BK Anteil','NK Werbekosten','BK Werbekosten']];
+        for (let i=0; i<12; i++) {
+            const m = monthly[i] || {};
+            const nu = Number(m.nk_umsatz)||0; const bu = Number(m.bk_umsatz)||0;
+            data.push([MONTHS[i], nu, bu, nu+bu ? nu/(nu+bu) : '', nu+bu ? bu/(nu+bu) : '', m.nk_wk||'', m.bk_wk||'']);
+        }
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, `NK vs BK ${yr}`);
+    }
+
+    // Kohorten
+    {
+        const data = [['Kohorte','Kunden','Umsatz','Umsatz/Kunde','Werbekosten','DB','DB/Kunde','Wiederkaufrate']];
+        state.kohorten.forEach(r => {
+            const k = Number(r.kunden)||0; const u = Number(r.umsatz)||0; const w = Number(r.wk)||0;
+            data.push([r.kohorte, k, u, k ? u/k : '', w, u-w, k ? (u-w)/k : '', r.wkr === '' ? '' : Number(r.wkr)||'']);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, 'Kohorten');
+    }
+
+    // Einschätzung
+    {
+        const e = state.einschaetzung;
+        const data = [
+            ['📅 Zeitraum / Berichtsmonat', e.zeitraum || ''],
+            [],
+            ['✅ Welche Kanäle skalieren aktuell gut?'], [e.skalieren || ''],
+            [],
+            ['⚠️ Welche Kanäle sind grenzwertig oder unrentabel?'], [e.grenzwertig || ''],
+            [],
+            ['📦 Welche Produktgruppen tragen den Großteil?'], [e.produkte || ''],
+            [],
+            ['📉 Datenlücken / Unsicherheiten'], [e.luecken || ''],
+            [],
+            ['🔍 Beobachtungen / Auffälligkeiten'], [e.beobachtungen || ''],
+            [],
+            ['🚀 Geplante Maßnahmen'], [e.massnahmen || ''],
+            [],
+            ['❓ Offene Fragen'], [e.offen || '']
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        ws['!cols'] = [{wch: 80}];
+        XLSX.utils.book_append_sheet(wb, ws, 'Einschätzung');
+    }
+
+    const fname = `North-Star-Metrics_${(state.customer.shop||'shop').replace(/[^a-z0-9]/gi,'-')}.xlsx`;
+    XLSX.writeFile(wb, fname);
+}
+
+/* =================================================================
+   EXPORT: PDF
+   ================================================================= */
+document.getElementById('btnExportPdf').addEventListener('click', exportPdf);
+document.getElementById('btnExportPdf2').addEventListener('click', exportPdf);
+
+function exportPdf() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+
+    function header(title, subtitle) {
+        doc.setFillColor(10, 10, 10);
+        doc.rect(0, 0, pageW, 90, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(201, 169, 97);
+        doc.setFontSize(20); doc.text(title, 40, 38);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(200, 200, 200); doc.setFontSize(11);
+        const customer = state.customer.name || '–';
+        const shop = state.customer.shop || '–';
+        doc.text(`Kunde: ${customer}    ·    Shop: ${shop}`, 40, 60);
+        doc.setTextColor(140, 140, 140); doc.setFontSize(9);
+        doc.text(subtitle, 40, 78);
+    }
+
+    // ── Page 1: Monatsdaten current year
+    header('North Star Metrics', `Monatsdaten ${state.activeYear}    ·    Stand: ${new Date().toLocaleDateString('de-DE')}`);
+
+    const head = [['KPI', ...MONTHS, 'Gesamt']];
+    const body = [];
+    const agg = aggFor(state.activeYear);
+    const get = (id, mi) => getCellY(state.activeYear, id, mi);
+    ROWS.forEach(row => {
+        if (row.type === 'section') {
+            body.push([{ content: row.label, colSpan: 14, styles: { fillColor: [27,58,107], textColor: 232, fontStyle: 'bold', halign: 'left' } }]);
+            return;
+        }
+        if (row.type === 'subsection') {
+            body.push([{ content: row.label, colSpan: 14, styles: { fillColor: [46,109,164], textColor: 232, fontStyle: 'bold', halign: 'left' } }]);
+            return;
+        }
+        const line = [row.label];
+        for (let i=0; i<12; i++) {
+            const v = (row.type === 'calc') ? row.calc(i, get) : get(row.id, i);
+            line.push(v === null || v === undefined || isNaN(v) ? '–' : fmtBy(row.format, v));
+        }
+        let v = null;
+        if (row.total === 'sum') v = agg.sum(row.id);
+        else if (row.total === 'avgNonZero') v = agg.avgNonZero(row.id);
+        else if (row.total === 'calc' && row.totalCalc) v = row.totalCalc(agg);
+        line.push(v === null || isNaN(v) ? '–' : fmtBy(row.format, v));
+
+        const rowStyles = row.type === 'required' ? { fillColor: [255,240,220], textColor: 80 }
+                       : row.type === 'calc' ? { fillColor: [248,244,232], textColor: [138,112,56], fontStyle: 'bold' }
+                       : { fillColor: [253,251,240], textColor: 60 };
+        body.push(line.map((val, idx) => ({
+            content: val,
+            styles: idx === 0 ? { ...rowStyles, halign: 'left', fontStyle: row.type === 'required' ? 'bold' : (rowStyles.fontStyle || 'normal') }
+                  : idx === 13 ? { ...rowStyles, halign: 'right', fontStyle: 'bold', fillColor: [240,232,210] }
+                  : { ...rowStyles, halign: 'right' }
+        })));
+    });
+    doc.autoTable({
+        head, body, startY: 110, theme: 'grid',
+        styles: { font: 'helvetica', fontSize: 7, cellPadding: 3, lineColor: [220,220,220], lineWidth: 0.3 },
+        headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold', fontSize: 7, halign: 'right' },
+        columnStyles: { 0: { cellWidth: 130, halign: 'left', fontStyle: 'bold' } },
+        margin: { left: 30, right: 30 }
+    });
+
+    // ── Page: Kanal-Rentabilität
+    doc.addPage();
+    header('Kanal-Rentabilität', `Geschäftsjahr ${state.kanal.year}`);
+    {
+        const aggK = aggFor(state.kanal.year);
+        let totU = 0, totW = 0;
+        const rows = CHANNELS.map(c => ({ name: c.label, u: aggK.sum('umsatz_'+c.key), w: aggK.sum('wk_'+c.key) }));
+        const extra = getKanalExtra(state.kanal.year);
+        EXTRA_CHANNELS.forEach(name => {
+            const e = extra[name] || {};
+            rows.push({ name, u: Number(e.umsatz)||0, w: Number(e.wk)||0 });
+        });
+        rows.forEach(r => { totU += r.u; totW += r.w; });
+        const body2 = rows.map(r => {
+            const roas = r.w ? r.u/r.w : null;
+            const db = r.u - r.w;
+            return [r.name, fmtEUR(r.u), fmtEUR(r.w), roas === null ? '–' : fmtNUM2(roas)+'x', fmtEUR(db), fmtPCT(r.u ? db/r.u : null), fmtPCT(totU ? r.u/totU : null)];
+        });
+        body2.push([{ content: 'GESAMT', styles: { fontStyle: 'bold', fillColor: [240,232,210] }},
+                    fmtEUR(totU), fmtEUR(totW), totW ? fmtNUM2(totU/totW)+'x' : '–',
+                    fmtEUR(totU-totW), totU ? fmtPCT((totU-totW)/totU) : '–', '100%']);
+        doc.autoTable({
+            head: [['Werbekanal','Umsatz','Werbekosten','ROAS','DB','DB-Marge','Anteil']],
+            body: body2, startY: 110, theme: 'grid',
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 5 },
+            headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold' }
+        });
+    }
+
+    // ── Page: Jahresvergleich
+    doc.addPage();
+    header('Jahresvergleich', '2023 – 2028');
+    {
+        const head3 = [['KPI', ...COMPARE_YEARS.map(String)]];
+        const body3 = COMPARE_ROWS.map(row => {
+            const line = [row.label];
+            COMPARE_YEARS.forEach(y => {
+                const v = getJahrValue(row, y);
+                line.push(v === null ? '–' : fmtBy(row.format, v));
+            });
+            return line;
+        });
+        doc.autoTable({
+            head: head3, body: body3, startY: 110, theme: 'grid',
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 5 },
+            headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold' }
+        });
+    }
+
+    // ── Page: Produktgruppen
+    doc.addPage();
+    header('Produktgruppen', 'Umsatz & Rentabilität');
+    {
+        let tu = 0, tw = 0;
+        state.produkt.groups.forEach((g,i) => {
+            const t = state.produkt.totals[i] || {};
+            tu += Number(t.umsatz)||0; tw += Number(t.wk)||0;
+        });
+        const body4 = state.produkt.groups.map((g,i) => {
+            const t = state.produkt.totals[i] || {};
+            const u = Number(t.umsatz)||0; const w = Number(t.wk)||0;
+            return [g, fmtEUR(u), fmtPCT(tu ? u/tu : null), fmtEUR(w), fmtEUR(u-w), fmtPCT(u ? (u-w)/u : null)];
+        });
+        body4.push([{ content: 'GESAMT', styles: { fontStyle: 'bold', fillColor: [240,232,210] }},
+                    fmtEUR(tu), '100%', fmtEUR(tw), fmtEUR(tu-tw), tu ? fmtPCT((tu-tw)/tu) : '–']);
+        doc.autoTable({
+            head: [['Produktgruppe','Umsatz','Anteil','Werbekosten','DB','DB-Marge']],
+            body: body4, startY: 110, theme: 'grid',
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 5 },
+            headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold' }
+        });
+    }
+
+    // ── Page: NK vs. BK
+    doc.addPage();
+    header('Neukunden vs. Bestandskunden', `Geschäftsjahr ${state.nkbk.year}`);
+    {
+        const yr = state.nkbk.year;
+        const monthly = state.nkbk.monthly[yr] || {};
+        const body5 = [];
+        let nu=0, bu=0, nw=0, bw=0;
+        for (let i=0; i<12; i++) {
+            const m = monthly[i] || {};
+            const a = Number(m.nk_umsatz)||0, b = Number(m.bk_umsatz)||0;
+            const c = Number(m.nk_wk)||0, d = Number(m.bk_wk)||0;
+            nu += a; bu += b; nw += c; bw += d;
+            body5.push([MONTHS[i], fmtEUR(a), fmtEUR(b), a+b ? fmtPCT(a/(a+b)) : '–', a+b ? fmtPCT(b/(a+b)) : '–', fmtEUR(c), fmtEUR(d)]);
+        }
+        body5.push([{ content: 'GESAMT', styles: { fontStyle: 'bold', fillColor: [240,232,210] }},
+                    fmtEUR(nu), fmtEUR(bu), nu+bu ? fmtPCT(nu/(nu+bu)) : '–', nu+bu ? fmtPCT(bu/(nu+bu)) : '–', fmtEUR(nw), fmtEUR(bw)]);
+        doc.autoTable({
+            head: [['Monat','NK Umsatz','BK Umsatz','NK Anteil','BK Anteil','NK Werbekosten','BK Werbekosten']],
+            body: body5, startY: 110, theme: 'grid',
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 5 },
+            headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold' }
+        });
+    }
+
+    // ── Page: Kohorten
+    if (state.kohorten.some(r => r.kunden || r.umsatz)) {
+        doc.addPage();
+        header('Kohortenanalyse', 'Kunden nach Erstkauf-Monat');
+        const body6 = state.kohorten.map(r => {
+            const k = Number(r.kunden)||0; const u = Number(r.umsatz)||0; const w = Number(r.wk)||0;
+            const wkr = r.wkr === '' || r.wkr === null ? null : Number(r.wkr);
+            return [r.kohorte || '–', fmtNUM(k), fmtEUR(u), fmtEUR(k ? u/k : null), fmtEUR(w), fmtEUR(u-w), fmtEUR(k ? (u-w)/k : null), wkr === null ? '–' : fmtPCT(wkr)];
+        });
+        doc.autoTable({
+            head: [['Kohorte','Kunden','Umsatz','Umsatz/Kunde','Werbekosten','DB','DB/Kunde','Wiederkaufrate']],
+            body: body6, startY: 110, theme: 'grid',
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 5 },
+            headStyles: { fillColor: [21,21,16], textColor: [201,169,97], fontStyle: 'bold' }
+        });
+    }
+
+    // ── Page: Einschätzung
+    {
+        const e = state.einschaetzung;
+        const hasContent = Object.values(e).some(v => v && v.trim());
+        if (hasContent) {
+            doc.addPage();
+            header('Einschätzung & Offene Punkte', e.zeitraum || '');
+            let y = 130;
+            const blocks = [
+                ['✅ Welche Kanäle skalieren aktuell gut?', e.skalieren],
+                ['⚠️ Welche Kanäle sind grenzwertig?', e.grenzwertig],
+                ['📦 Welche Produktgruppen tragen den Großteil?', e.produkte],
+                ['📉 Datenlücken / Unsicherheiten', e.luecken],
+                ['🔍 Beobachtungen / Auffälligkeiten', e.beobachtungen],
+                ['🚀 Geplante Maßnahmen', e.massnahmen],
+                ['❓ Offene Fragen / Nächste Schritte', e.offen]
+            ];
+            blocks.forEach(([title, text]) => {
+                if (!text || !text.trim()) return;
+                if (y > pageH - 100) { doc.addPage(); y = 60; }
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(201,169,97);
+                doc.text(title, 40, y); y += 14;
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40,40,40);
+                const lines = doc.splitTextToSize(text, pageW - 80);
+                doc.text(lines, 40, y);
+                y += lines.length * 13 + 14;
+            });
+        }
+    }
+
+    // ── Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let p=1; p<=pageCount; p++) {
+        doc.setPage(p);
+        doc.setFontSize(8); doc.setTextColor(140,140,140);
+        doc.text(`Lang Consulting · langconsulting.de · Seite ${p}/${pageCount}`, pageW/2, pageH - 18, { align: 'center' });
+    }
+
+    const fname = `North-Star-Metrics_${(state.customer.shop||'shop').replace(/[^a-z0-9]/gi,'-')}.pdf`;
+    doc.save(fname);
+}
+
+/* =================================================================
+   SCROLL & INIT
+   ================================================================= */
+window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progressBar').style.width = Math.max(0, Math.min(100, scrolled)) + '%';
+}, { passive: true });
+
+function refreshScrollIndicators() {
+    document.querySelectorAll('.table-scroll').forEach(sc => {
+        const wrap = sc.closest('.table-wrap');
+        if (!wrap) return;
+        const hasOverflow = sc.scrollWidth > sc.clientWidth + 2;
+        const maxScroll = sc.scrollWidth - sc.clientWidth;
+        wrap.classList.toggle('has-scroll-left', sc.scrollLeft > 4);
+        wrap.classList.toggle('has-scroll-right', hasOverflow && sc.scrollLeft < maxScroll - 4);
+    });
+}
+document.querySelectorAll('.table-scroll').forEach(sc => {
+    sc.addEventListener('scroll', refreshScrollIndicators, { passive: true });
+});
+window.addEventListener('resize', refreshScrollIndicators, { passive: true });
+
+// Activate the right year tab in monatsdaten on init
+document.querySelectorAll('.tab-switch .tab-btn[data-year]').forEach(b => {
+    b.classList.toggle('active', b.dataset.year === state.activeYear);
+});
+
+/* INIT */
+renderMonatsdatenHead();
+renderMonatsdatenBody();
+recomputeMonatsdaten();
+fillMonthSelect();
+renderDashboard();
+renderKanal();
+renderJahresvergleich();
+renderProduktgruppen();
+renderNKBK();
+renderKohorten();
+bindEinschaetzung();
+setTimeout(refreshScrollIndicators, 120);
+</script>
+
+</body>
+</html>
